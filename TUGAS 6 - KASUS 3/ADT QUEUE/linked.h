@@ -6,16 +6,6 @@ Jurusan: Teknik Komputer dan Informatika
 Politeknik Negeri Bandung
 */
 
-/*Author: Devi Maulnai 
-NIM: 241524007
-Kelas: 1A
-Prodi: Sarjana Terapan Teknik Informatika
-Jurusan: Teknik Komputer dan Informatika
-Politeknik Negeri Bandung
-*/
-
-
-
 #ifndef linked_H
 #define linked_H
 #include <stdio.h>

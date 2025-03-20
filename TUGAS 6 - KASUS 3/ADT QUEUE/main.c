@@ -18,7 +18,7 @@ int main() {
     CreateQueue(&Q);
 
     do {
-        printf("\nMenu:\n");
+        printf("\n === SISTEM ANTRIAN BANK === \n");
         printf("1. Tambah Antrian (EnQueue)\n");
         printf("2. Hapus Antrian (DeQueue)\n");
         printf("3. Tampilkan Antrian\n");

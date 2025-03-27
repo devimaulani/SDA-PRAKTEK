@@ -7,7 +7,6 @@ Politeknik Negeri Bandung
 */
 
 
-
 #ifndef KOTA_H
 #define KOTA_H
 

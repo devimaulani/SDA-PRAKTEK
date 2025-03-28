@@ -33,6 +33,9 @@ void Del_Akhir(address *p, infotype *X);
 void Del_After(address *pBef, infotype *X);
 void DeAlokasi(address *p);
 int NbElmt(address p);
+void modify_first(address head, infotype new_data);
+void modify_last(address head, infotype new_data);
+void modify_middle(address head, infotype new_data, int position);
 
 #endif
 

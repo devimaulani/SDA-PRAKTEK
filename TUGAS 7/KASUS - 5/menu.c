@@ -1,3 +1,12 @@
+/*Author: Devi Maulnai 
+NIM: 241524007
+Kelas: 1A
+Prodi: Sarjana Terapan Teknik Informatika
+Jurusan: Teknik Komputer dan Informatika
+Politeknik Negeri Bandung 
+*/
+
+
 #include "menu.h"
 #include <stdio.h>
 
@@ -17,6 +26,7 @@ void prosesMenu(Kota A[], int *jumlahKota) {
     char nama[50], kota[50];
 
     do {
+    	
         TampilkanMenu();
         printf("Pilih menu: ");
         scanf("%d", &pilihan);

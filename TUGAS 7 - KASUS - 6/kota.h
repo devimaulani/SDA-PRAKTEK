@@ -19,12 +19,12 @@ typedef struct tKota {
 } Kota;
 
 void tambahKota(KotaAddress *head, infotype namaKota);
-void hapusSemuaNama(List *daftarNama);
+void hapusSemuaNama(List *daftarNama);                    //fungsi tambahan 
 void hapusKota(KotaAddress *head, infotype namaKota);
 void tambahNama(KotaAddress head, infotype namaKota, infotype namaOrang);
 void hapusNama(KotaAddress head, infotype namaKota, infotype namaOrang);
 void tampilkanKota(KotaAddress head);
 void hitungData(KotaAddress head);
-void cariNamaPerKota(KotaAddress head, infotype namaKota); 
+void cariNamaPerKota(KotaAddress head, infotype namaKota); //fungsi tambahan 
 
 #endif

@@ -6,9 +6,9 @@ Jurusan: Teknik Komputer dan Informatika
 Politeknik Negeri Bandung
 */
 
-
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "listbuku.h"
 #include "peminjam.h"
 #include "antreanorang.h" // Gunakan header yang sesuai
@@ -51,6 +51,12 @@ void tampilkanMenu() {
                 break;
 
             case 3:
+                // Tampilkan daftar buku terlebih dahulu
+                printf("\nDaftar Buku yang Tersedia:\n");
+                printf("--------------------------\n");
+                tampilkanSemuaBuku();
+                printf("--------------------------\n");
+                
                 printf("Nama peminjam: ");
                 fgets(nama, sizeof(nama), stdin);
                 nama[strcspn(nama, "\n")] = 0;
@@ -63,33 +69,86 @@ void tampilkanMenu() {
                 fgets(judul, sizeof(judul), stdin);
                 judul[strcspn(judul, "\n")] = 0;
 
-                buku = cariBuku(judul);
+                
+                // Pencarian buku dengan perbandingan case-insensitive
+                buku = NULL;
+                Buku* current = Head_Buku;
+                while (current != NULL) {
+                    // Untuk Windows, gunakan _stricmp
+                    #ifdef _WIN32
+                    if (_stricmp(current->judul, judul) == 0) {
+                        buku = current;
+                        break;
+                    }
+                    #else
+                    // Untuk Unix-like sistem
+                    if (strcasecmp(current->judul, judul) == 0) {
+                        buku = current;
+                        break;
+                    }
+                    #endif
+                    
+                    // Coba juga dengan strcmp biasa
+                    if (strcmp(current->judul, judul) == 0) {
+                        buku = current;
+                        break;
+                    }
+                    
+                    current = current->next;
+                }
+                
                 if (buku == NULL) {
                     printf("Buku tidak ditemukan.\n");
-                } else {
-                    peminjamBaru = buatPeminjam(nama, tipe, buku);
-
-                    // Temukan antrean yang ada berdasarkan buku
-                    AntreanOrang *antrean = temukanAntreanDariBuku(buku);
-                    if (antrean == NULL) {
-                        // Jika antrean tidak ada, buat antrean baru
-                        antrean = aksesAntreanKosongAtauAda(buku);
+                    
+                    // Debug: Cek semua buku yang ada di daftar untuk bandingkan judul
+                    printf("\nMemeriksa semua buku yang ada:\n");
+                    current = Head_Buku;
+                    while (current != NULL) {
+                        printf("Buku di daftar: '%s' (strcmp result: %d)\n", 
+                               current->judul, 
+                               strcmp(current->judul, judul));
+                        current = current->next;
                     }
-
-                    // Tambahkan peminjam ke antrean berdasarkan prioritas
-                    tambahAntrean(antrean);
-                    printf("Peminjam berhasil ditambahkan ke antrean.\n");
+                } else if (buku->stok <= 0) {
+                    printf("Maaf, stok buku '%s' habis.\n", buku->judul);
+                    
+                    // Buat antrean baru jika belum ada
+                    AntreanOrang *nodeAntrean = temukanAntreanDariBuku(buku);
+                    if (nodeAntrean == NULL) {
+                        nodeAntrean = buatNodeAntrean();
+                        
+                        // Buat peminjam baru
+                        peminjamBaru = buatPeminjam(nama, tipe, buku);
+                        nodeAntrean->antrean = peminjamBaru;
+                        
+                        tambahAntrean(nodeAntrean);
+                        printf("Peminjam ditambahkan ke antrean baru untuk buku '%s'.\n", buku->judul);
+                    } else {
+                        // Sudah ada antrean untuk buku ini
+                        peminjamBaru = buatPeminjam(nama, tipe, buku);
+                        tambahPeminjamBerdasarkanPrioritas(&(nodeAntrean->antrean), peminjamBaru);
+                        printf("Peminjam ditambahkan ke antrean yang sudah ada untuk buku '%s'.\n", buku->judul);
+                    }
+                } else {
+                    // Ada stok buku, bisa langsung dipinjam
+                    buku->stok--;
+                    printf("Buku '%s' berhasil dipinjam oleh %s.\n", buku->judul, nama);
                 }
                 break;
 
             case 4:
                 printf("\n--- Antrean Peminjam ---\n");
-                AntreanOrang *curr = DaftarAntrean;
-                while (curr != NULL) {
-                    // Tampilkan antrean untuk setiap buku
-                    printf("Buku: %s\n", curr->antrean->buku->judul); // Asumsi antrean menyimpan pointer ke buku
-                    tampilkanAntreanPeminjam(curr->antrean);
-                    curr = curr->next;
+                if (antreanKosong()) {
+                    printf("Tidak ada antrean peminjam.\n");
+                } else {
+                    AntreanOrang *curr = DaftarAntrean;
+                    while (curr != NULL) {
+                        if (curr->antrean != NULL) {
+                            printf("Buku: %s\n", curr->antrean->buku->judul);
+                            tampilkanAntreanPeminjam(curr->antrean);
+                        }
+                        curr = curr->next;
+                    }
                 }
                 break;
 
@@ -103,3 +162,6 @@ void tampilkanMenu() {
 
     } while (pilihan != 5);
 }
+
+
+

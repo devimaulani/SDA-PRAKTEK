@@ -9,6 +9,7 @@ Politeknik Negeri Bandung
 
 #include "antreanorang.h"
 #include <stdlib.h>
+#include <stdio.h>
 
 AntreanOrang *DaftarAntrean = NULL;
 
@@ -36,6 +37,11 @@ void tambahAntrean(AntreanOrang *nodeBaru) {
 }
 
 AntreanOrang *temukanAntreanDariBuku(Buku *buku) {
+    
+    if (antreanKosong()) {
+        return NULL;
+    }
+    
     AntreanOrang *temp = DaftarAntrean;
     while (temp != NULL) {
         if (temp->antrean != NULL && temp->antrean->buku == buku) {
@@ -43,17 +49,25 @@ AntreanOrang *temukanAntreanDariBuku(Buku *buku) {
         }
         temp = temp->next;
     }
+
     return NULL;
 }
 
 AntreanOrang *aksesAntreanKosongAtauAda(Buku *buku) {
+    
+    
     AntreanOrang *temp = DaftarAntrean;
     while (temp != NULL) {
-        if (temp->antrean == NULL || temp->antrean->buku == buku) {
+        if (temp->antrean == NULL) {
+            return temp;
+        }
+        if (temp->antrean->buku == buku) {
             return temp;
         }
         temp = temp->next;
     }
+    
+
     return NULL;
 }
 
@@ -74,3 +88,4 @@ void hapusSemuaAntrean() {
     }
     DaftarAntrean = NULL;
 }
+

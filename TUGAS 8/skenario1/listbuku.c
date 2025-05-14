@@ -84,13 +84,45 @@ void deleteBuku(char judul[]) {
 
 // Mencari buku berdasarkan judul dan mengembalikan pointer ke buku
 Buku* cariBuku(char judul[]) {
+   
+    
+    if (Head_Buku == NULL) {
+        
+        return NULL;
+    }
+    
     Buku* current = Head_Buku;
+    int found = 0;
+    
     while (current != NULL) {
-        if (strcmp(current->judul, judul) == 0) {
+        // Gunakan fungsi strcasecmp untuk abaikan perbedaan huruf besar/kecil
+        // Jika tidak tersedia di sistem, gunakan strcmp
+        #ifdef _WIN32
+        // Untuk Windows, gunakan stricmp (case insensitive)
+        int result = _stricmp(current->judul, judul);
+        #else
+        // Untuk sistem lain, gunakan strcasecmp (case insensitive)
+        int result = strcasecmp(current->judul, judul);
+        #endif
+        
+               
+        if (result == 0) {
+            
+            found = 1;
             return current;
         }
+        
+        // Alternatif: gunakan perbandingan string case sensitive standar
+        if (strcmp(current->judul, judul) == 0) {
+            
+            found = 1;
+            return current;
+        }
+        
         current = current->next;
     }
+    
+    
     return NULL;
 }
 
@@ -121,3 +153,4 @@ void bersihkanListBuku() {
     Head_Buku = NULL;
     printf("Seluruh list buku telah dibersihkan.\n");
 }
+

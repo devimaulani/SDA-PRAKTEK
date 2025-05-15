@@ -3,6 +3,7 @@
 #include "listbuku.h"
 #include "peminjam.h"
 #include "menu.h"
+#include <string.h>
 
 void tampilkanMenu() {
     int pilihan;
@@ -17,7 +18,8 @@ void tampilkanMenu() {
         printf("2. Tampilkan Daftar Buku\n");
         printf("3. Tambah Peminjam\n");
         printf("4. Tampilkan Antrean Peminjam\n");
-        printf("5. Keluar\n");
+        printf("5. Pengembalian Buku\n");
+        printf("6. Keluar\n");
         printf("Pilih menu: ");
         scanf("%d", &pilihan);
         getchar(); // Bersihkan newline
@@ -39,10 +41,16 @@ void tampilkanMenu() {
 
             case 2:
                 // Tampilkan Daftar Buku
-                tampilkanSemuaBuku(Head_Buku);
+                tampilkanSemuaBuku();
                 break;
 
             case 3:
+            	 // Tampilkan daftar buku terlebih dahulu
+                printf("\nDaftar Buku yang Tersedia:\n");
+                printf("--------------------------\n");
+                tampilkanSemuaBuku();
+                printf("--------------------------\n");
+            	
                 // Tambah Peminjam
                 printf("Nama peminjam: ");
                 fgets(nama, sizeof(nama), stdin);
@@ -62,9 +70,19 @@ void tampilkanMenu() {
                 } else {
                     peminjamBaru = buatPeminjam(nama, tipe);
 
-                    // Tambahkan peminjam ke antrean berdasarkan prioritas
-                    tambahPeminjamBerdasarkanPrioritas(&buku->antrean, peminjamBaru);
-                    printf("Peminjam berhasil ditambahkan ke antrean buku \"%s\".\n", buku->judul);
+                    // Cek stok buku
+                    if (buku->stok > 0) {
+                        // Ada stok, langsung pinjamkan buku
+                        buku->stok--;
+                        printf("Buku \"%s\" berhasil dipinjam oleh %s.\n", buku->judul, nama);
+                        printf("Stok tersisa: %d\n", buku->stok);
+                        // Peminjam tidak perlu dimasukkan ke antrean, tapi perlu dibebaskan
+                        free(peminjamBaru);
+                    } else {
+                        // Tidak ada stok, masukkan ke antrean
+                        tambahPeminjamBerdasarkanPrioritas(&buku->antrean, peminjamBaru);
+                        printf("Stok habis. %s ditambahkan ke antrean peminjam buku \"%s\".\n", nama, buku->judul);
+                    }
                 }
                 break;
 
@@ -83,16 +101,47 @@ void tampilkanMenu() {
                     tampilkanAntreanPeminjam(buku->antrean);
                 }
                 break;
-
+                
             case 5:
+                // Pengembalian Buku
+                printf("\n--- Pengembalian Buku ---\n");
+                char judulKembali[50];
+                printf("Masukkan judul buku yang dikembalikan: ");
+                fgets(judulKembali, sizeof(judulKembali), stdin);
+                judulKembali[strcspn(judulKembali, "\n")] = 0;
+
+                buku = cariBuku(judulKembali);
+                if (buku == NULL) {
+                    printf("Buku tidak ditemukan.\n");
+                } else {
+                    // Kembalikan buku (tambah stok)
+                    buku->stok++;
+                    printf("Buku \"%s\" berhasil dikembalikan. Stok sekarang: %d\n", buku->judul, buku->stok);
+                    
+                    // Cek apakah ada antrean peminjam
+                    if (buku->antrean != NULL) {
+                        Peminjam* peminjamBerikutnya = buku->antrean;
+                        buku->antrean = buku->antrean->next;
+                        
+                        printf("Memberikan buku kepada peminjam berikutnya dalam antrean: %s\n", peminjamBerikutnya->nama);
+                        buku->stok--; // Kurangi stok karena langsung dipinjamkan
+                        
+                        free(peminjamBerikutnya); // Bebaskan memori peminjam
+                        printf("Stok tersisa: %d\n", buku->stok);
+                    }
+                }
+                break;
+
+            case 6:
                 // Keluar dari program
                 printf("Keluar dari program.\n");
+                bersihkanListBuku(); // Membersihkan memory sebelum keluar
                 break;
 
             default:
                 printf("Pilihan tidak valid.\n");
         }
 
-    } while (pilihan != 5);
+    } while (pilihan != 6);
 }
 
